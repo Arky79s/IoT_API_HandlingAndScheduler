@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>My website</title>
+    </head>
+    <body>
+        <div>
+            Go to:
+            <a href="{{ url_for('index_func') }}">Home</a><br>
+            <a href="{{ url_for('receive_command')}}">Contorl page</a><br>
+            <a href="{{ url_for('command_with_action', action='temperature') }}">Temp Contorl page</a><br>
+            
+            <a href="{{ url_for('debug_shutdown')}}">debug_shutdown</a>
+            <a href="{{ url_for('debug_states')}}">debug_states</a>
+            <a href="{{ url_for('debug_scheduler_jobs')}}">debug_scheduler_jobs</a>
+
+
+            
+            
+            ()
+            
+        </div>
+        {% block content %}
+            
+        {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="command-main">
+    <h2>디바이스 제어</h2>
+    <nav class="command-nav">
+        <ul>
+            <li><a href="{{ url_for('command_with_action', action='temperature') }}">온도 제어</a></li>
+            <li><a href="{{ url_for('command_with_action', action='power') }}">전원 제어</a></li>
+            <li><a href="{{ url_for('command_with_action', action='mode') }}">모드 제어</a></li>
+            <li><a href="{{ url_for('command_with_action', action='fan') }}">팬 속도 제어</a></li>
+        </ul>
+    </nav>
+</div>
+{% endblock %}

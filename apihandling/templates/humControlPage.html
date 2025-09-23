@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    <p>
+        This is Temperture Contorl page.
+    </p>
+    <form action="/posts" method="POST">
+        <input type="text" id="TempertureInput"
+        name="TempertureInput" plaseholder="18~30">
+        <input type="text" id="UserIdInput"
+        name="UserIdInput" placeholder="id">
+        <input type="submit" value="Submit">
+    </form>
+    {% if result %}
+    <p>result: {{result.tempData}} </p>
+    {% endif %}
+
+</div>
+{% endblock %}

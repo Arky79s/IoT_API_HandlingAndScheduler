@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    <p>
+        This is Mode Select Contorl page.
+    </p>
+    <form action="/tempControl" method="POST">
+        <input type = "radio" id = "PowerOn" name = "modeOption" value = "PowerOn"> <label for = "optionM"> 파워온 </label><br>
+        <input type = "radio"  id = "PowerOff" name = "modeOption" value = "PowerOff"> <label for = "optionM"> 파워오프 </label><br>
+        <input type = "radio"  id = "modeControl" name = "modeOption" value = "M"> <label for = "optionM"> 모드 </label><br>
+        <input type ="radio" id = "tempControl" name = "modeOption" value = "T" checked> 
+        <label for = "optionT">온도</label><br>      
+        <input type ="radio" id = "fanOtion" name = "modeOption" value = "F">       
+        <label for  = "optionF">팬 속도</label><br>        
+        <input type = "text" id = "remoteInfoInput"
+        name = "remoteInfoInput" placeholder = " 파워를 제외한 설정값 입력">
+        <input type="checkbox" id="confirmCheckbox" >
+        <label for="confirmCheckbox">확인</label><br>
+
+        <input type = "submit" value = "Submit">
+    </form>
+    {% if result %}
+    <p>result: {{result.airconInfoData}} </p>
+    {% endif %}
+
+</div>
+
+<script>
+
+
+
+</script>
+{% endblock %}

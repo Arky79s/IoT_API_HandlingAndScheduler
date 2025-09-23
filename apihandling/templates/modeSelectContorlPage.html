@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    <p>This is Mode Select Control page.</p>
+    <form action="/tempControl" method="POST" id="controlForm">
+        <input type="radio" id="PowerOn" name="modeOption" value="PowerOn" onclick="updateInputValidation('power')"> 
+        <label for="PowerOn">파워온</label><br>
+        
+        <input type="radio" id="PowerOff" name="modeOption" value="PowerOff" onclick="updateInputValidation('power')"> 
+        <label for="PowerOff">파워오프</label><br>
+        
+        <input type="radio" id="modeControl" name="modeOption" value="M" onclick="updateInputValidation('mode')"> 
+        <label for="modeControl">모드</label><br>
+        
+        <input type="radio" id="tempControl" name="modeOption" value="T" onclick="updateInputValidation('temp')"> 
+        <label for="tempControl">온도</label><br>
+        
+        <input type="radio" id="fanOtion" name="modeOption" value="F" onclick="updateInputValidation('fan')">
+        <label for="fanOtion">팬 속도</label><br>
+        
+        <input type="number" id="remoteInfoInput" name="remoteInfoInput" 
+               placeholder="설정값을 선택하세요">
+        <span id="validationMessage" style="color: red;"></span>
+
+        <input type="submit" value="Submit">
+    </form>
+    {% if result %}
+    <p>result: {{result.tempData}}</p>
+    {% endif %}
+</div>
+
+<script>
+//const validationRules = {
+//    mode: { min: 0, max: 4, message: '모드는 0(냉방)~4(제습) 사이 값만 입력 가능합니다' },
+//    temp: { min: 18, max: 32, message: '온도는 18°C~32°C 사이 값만 입력 가능합니다' },
+//    fan: { min: 0, max: 3, message: '팬 속도는 0(미풍)~3(강풍) 사이 값만 입력 //가능합니다' },
+//    power: { disabled: true, message: '파워 제어시 설정값이 필요하지 않습니다' }
+//};
+//
+//function updateInputValidation(type) {
+//    const input = document.getElementById('remoteInfoInput');
+//    const messageSpan = document.getElementById('validationMessage');
+//    const rule = validationRules[type];
+//
+//    if (rule.disabled) {
+//        input.value = '';
+//        input.disabled = true;
+//        input.placeholder = rule.message;
+//        messageSpan.textContent = '';
+//    } else {
+//        input.disabled = false;
+//        input.type = 'number';
+//        input.min = rule.min;
+//        input.max = rule.max;
+//        input.placeholder = `입력 가능 범위: ${rule.min}~${rule.max}`;
+//        messageSpan.textContent = '';
+//    }
+//}
+//
+//document.getElementById('controlForm').addEventListener('submit', function(e) {
+//    const selectedMode = document.querySelector('input[name="modeOption"]:checked');
+//    alert(selectedMode);
+//    if (!selectedMode) {
+//        e.preventDefault();
+//
+//        document.getElementById('validationMessage').textContent = '제어 모드를 //선택해주세요';
+//        return;
+//    }
+//
+//    const input = document.getElementById('remoteInfoInput');
+//    const mode = selectedMode.value;
+//    
+//    if (mode !== 'PowerOn' && mode !== 'PowerOff') {
+//        const value = parseInt(input.value);
+//        const rule = mode === 'M' ? validationRules.mode : 
+//                    mode === 'T' ? validationRules.temp : 
+//                    validationRules.fan;
+//
+//        if (isNaN(value) || value < rule.min || value > rule.max) {
+//            e.preventDefault();
+//            document.getElementById('validationMessage').textContent = rule.message;
+//        }
+//    }
+//});
+//
+//// 페이지 로드 시 초기화
+//document.addEventListener('DOMContentLoaded', function() {
+//    const input = document.getElementById('remoteInfoInput');
+//    input.placeholder = '제어 모드를 선택하세요';
+//});
+</script>
+{% endblock %}

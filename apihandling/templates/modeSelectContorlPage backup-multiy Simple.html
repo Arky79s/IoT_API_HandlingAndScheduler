@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .control-panel {
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .switch-item {
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        padding: 15px 10px;
+        text-align: center;
+        background-color: #f9f9f9;
+        transition: all 0.3s ease;
+    }
+    .switch-checkbox {
+        display: none;
+    }
+    .switch-label {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+        cursor: pointer;
+    }
+    .switch-slider {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        border-radius: 34px;
+        transition: .4s;
+    }
+    .switch-slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        border-radius: 50%;
+        transition: .4s;
+    }
+    .switch-checkbox:checked + .switch-label .switch-slider {
+        background-color: #2196F3;
+    }
+    .switch-checkbox:checked + .switch-label .switch-slider:before {
+        transform: translateX(30px);
+    }
+    .switch-slider:after {
+        content: 'OFF';
+        position: absolute;
+        left: 8px;
+        top: 6px;
+        color: white;
+        font-size: 12px;
+        opacity: 1;
+        transition: .4s;
+    }
+    .switch-checkbox:checked + .switch-label .switch-slider:after {
+        content: 'ON';
+        left: 32px;
+    }
+    .switch-number {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+    }
+    .control-options {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .radio-group {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+    .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .value-input {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        width: 200px;
+    }
+    .submit-btn {
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .submit-btn:hover {
+        background-color: #1976D2;
+    }
+    .selected-count {
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #2196F3;
+    }
+</style>
+
+<div class="control-panel">
+    <h2>디바이스 제어 패널</h2>
+    
+    <form action="/command" method="POST" id="controlForm">
+        <!-- 스위치 그리드 -->
+        <div class="grid-container">
+            {% for i in range(1, 41) %}
+            <div class="switch-item">
+                <div class="switch-number">디바이스 {{ i }}</div>
+                {% if i == 0 %}
+                    <input type="checkbox" id="switch{{ i }}" name="selectedDevices" value="{{os.getenv(ifId)}}" class="switch-checkbox">
+                {% elif %}
+                    <input type="checkbox" id="switch{{ i }}" name="selectedDevices" value="{{ i }}" class="switch-checkbox">
+                {%endif%}
+                <label for="switch{{ i }}" class="switch-label">
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- 선택된 개수 표시 -->
+        <div class="selected-count">선택된 디바이스: <span id="selectedCount">0</span>개</div>
+
+        <!-- 제어 옵션 -->
+        <div class="control-options">
+            <div class="radio-group">
+                <label>
+                    <input type="radio" id="PowerOn" name="modeOption" value="PowerOn" checked>
+                    <span>파워온</span>
+                </label>
+                <label>
+                    <input type="radio" id="PowerOff" name="modeOption" value="PowerOff">
+                    <span>파워오프</span>
+                </label>
+                <label>
+                    <input type="radio" id="modeControl" name="modeOption" value="M">
+                    <span>모드</span>
+                </label>
+                <label>
+                    <input type="radio" id="tempControl" name="modeOption" value="T">
+                    <span>온도</span>
+                </label>
+                <label>
+                    <input type="radio" id="fanOtion" name="modeOption" value="F">
+                    <span>팬 속도</span>
+                </label>
+            </div>
+
+            <input type="text" id="remoteInfoInput" name="remoteInfoInput" 
+                   class="value-input" placeholder="설정값을 입력하세요">
+
+            <button type="submit" class="submit-btn">선택된 디바이스 제어</button>
+        </div>
+    </form>
+    {% if result %}
+    <p>result: {{result.airconInfoData}} </p>
+    {% endif %}
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('controlForm');
+    const switches = document.querySelectorAll('.switch-checkbox');
+    const countDisplay = document.getElementById('selectedCount');
+    
+    // 스위치 선택 시 스타일 변경 및 카운트 업데이트
+    switches.forEach(switchEl => {
+        switchEl.addEventListener('change', function() {
+            const switchItem = this.closest('.switch-item');
+            if (this.checked) {
+                switchItem.classList.add('selected');
+            } else {
+                switchItem.classList.remove('selected');
+            }
+            updateSelectedCount();
+        });
+    });
+
+    // 선택된 스위치 개수 업데이트
+    function updateSelectedCount() {
+        const selectedCount = document.querySelectorAll('.switch-checkbox:checked').length;
+        countDisplay.textContent = selectedCount;
+    }
+
+    // 폼 제출 전 유효성 검사
+    form.addEventListener('submit', function(e) {
+        const selectedDevices = document.querySelectorAll('.switch-checkbox:checked');
+        const selectedMode = document.querySelector('input[name="modeOption"]:checked');
+        const remoteInfo = document.getElementById('remoteInfoInput');
+
+        if (selectedDevices.length === 0) {
+            e.preventDefault();
+            alert('하나 이상의 디바이스를 선택해주세요.');
+            return;
+        }
+
+        if (!selectedMode) {
+            e.preventDefault();
+            alert('제어 모드를 선택해주세요.');
+            return;
+        }
+
+        if (selectedMode.value !== 'PowerOn' && selectedMode.value !== 'PowerOff' && !remoteInfo.value) {
+            e.preventDefault();
+            alert('설정값을 입력해주세요.');
+            return;
+        }
+    });
+});
+</script>
+{% endblock %}

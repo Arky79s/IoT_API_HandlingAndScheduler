@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="temperature-control">
+    <h2>온도 제어</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div id="commandStatus" class="alert" style="display: none;"></div>
+
+    {% if current_mode == 4 %}
+    <div class="alert alert-warning">
+        <strong>알림:</strong> 제습 모드에서는 온도 제어를 사용할 수 없습니다.<br>
+        온도를 제어하려면 먼저 냉방 또는 난방 모드로 변경해주세요.
+    </div>
+    {% else %}
+    <form action="{{ url_for('command_with_action', action='temperature') }}" method="POST" id="commandForm">
+        <div class="device-selection">
+            <label for="device_id">디바이스 선택:</label>
+            <select name="device_id" id="device_id" required>
+                
+                {% for i in range(1, 41) %}
+                    {%  if i == 1 %}    
+                    <option value="ebaa45515fc010f02crcly">디바이스 {{ i }}</option>
+                    {%  else %}
+                    <option value="device{{ i }}">디바이스 {{ i }}</option>
+                    {% endif %}
+                
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="temperature-input">
+            <label for="value">온도 설정 {% if current_mode == 0 %}(냉방){% elif current_mode == 1 %}(난방){% endif %}:</label>
+            <input type="number" name="value" id="value" min="18" max="30" required
+                   placeholder="18°C ~ 30°C">
+            <div class="form-help">
+                {% if current_mode == 0 %}
+                냉방 모드 허용 범위: 18°C ~ 30°C
+                {% elif current_mode == 1 %}
+                난방 모드 허용 범위: 18°C ~ 30°C
+                {% endif %}
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">설정</button>
+    </form>
+    {% endif %}
+    {% if result %}
+    <p>result: {{result.device_states}} </p>
+    {% endif %}
+</div>
+
+<style>
+.temperature-control {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.temperature-control h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #2196F3;
+}
+
+.device-selection,
+.temperature-input {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: 500;
+}
+
+select,
+input[type="number"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+select:focus,
+input:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.form-help {
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.submit-btn {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #1976D2;
+}
+
+.alert {
+    padding: 12px 16px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#commandStatus.show {
+    display: block !important;
+    animation: fadeIn 0.3s ease;
+}
+</style>
+
+<script>
+document.getElementById('commandForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const statusDiv = document.getElementById('commandStatus');
+    const tempInput = document.getElementById('value');
+    const temp = parseInt(tempInput.value);
+    
+    // Validate temperature range
+    if (temp < 18 || temp > 30) {
+        statusDiv.className = 'alert alert-danger show';
+        statusDiv.textContent = '온도는 18°C에서 30°C 사이여야 합니다.';
+        return;
+    }
+    
+    try {
+        const formData = new FormData(form);
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('서버 오류가 발생했습니다');
+        }
+        
+        const result = await response.json();
+        
+        statusDiv.style.display = 'block';
+        if (result.status === 'scheduled') {
+            statusDiv.className = 'alert alert-warning show';
+            statusDiv.innerHTML = `${result.message}<br>실행 예정 시간: ${new Date(result.execution_time).toLocaleString()}`;
+        } else if (result.status === 'executed') {
+            statusDiv.className = 'alert alert-success show';
+            statusDiv.innerHTML = result.message;
+        } else {
+            statusDiv.className = 'alert alert-info show';
+            statusDiv.innerHTML = result.message;
+        }
+    } catch (error) {
+        statusDiv.style.display = 'block';
+        statusDiv.className = 'alert alert-danger show';
+        statusDiv.textContent = '오류가 발생했습니다: ' + error.message;
+    }
+});
+
+// Add input validation
+document.getElementById('value').addEventListener('input', function(e) {
+    const temp = parseInt(e.target.value);
+    const statusDiv = document.getElementById('commandStatus');
+    
+    if (temp < 18 || temp > 30) {
+        statusDiv.className = 'alert alert-warning show';
+        statusDiv.textContent = '온도는 18°C에서 30°C 사이여야 합니다.';
+    } else {
+        statusDiv.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
