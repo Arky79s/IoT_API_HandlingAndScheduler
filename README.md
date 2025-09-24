@@ -1,5 +1,5 @@
 # IoT Device Control API System
-
+>리드미 예시사이트 참고 GPT와 https://velog.io/@gmlstjq123/Readme.md-%ED%8C%8C%EC%9D%BC-%EC%9E%91%EC%84%B1%EB%B2%95
 ## 📌 프로젝트 개요
 
 이 프로젝트는 **IoT 디바이스 상태 확인 및 제어를 위한 API 시스템**입니다.  
@@ -20,20 +20,33 @@
   /project-root
 │
 ├── src/
+
 │   ├── model.py                # (활용도 낮음) 모델 정의 파일
+
 │   ├── controller/             # 제어 로직 담당
+
 │   │   ├── iot_controller.py   # 실제 디바이스 핸들링 로직
+
 │   └── scheduler/
+
 │       └── interval_runner.py  # 2분 간격 인터벌 스케줄러
+
 │
+
 ├── routes/
+
 │   ├── routes_refactory.py                       # 주요 라우팅 처리 파일
+
 │   ├── routes_refactory_3rd Scheduler_singleDevice beforeCoplete Last_Grok ver_proto.py
+
 │   └── routes_refactory_3rd Scheduler_singleDevice coplete copy 2.py
+
 │
 ├── API_IoTControl_TempCheack.py     # IoT 제어 핸들링 및 토큰 처리 파일
 │
+
 ├── requirements.txt
+
 └── README.md
 
 
