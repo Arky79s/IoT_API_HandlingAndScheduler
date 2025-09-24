@@ -15,6 +15,7 @@
       {"device_id": "exc_0002", "status": "OFF", "temp": 19.0}
   ]
 
+
 ⚙️ 프로젝트 구조
   /project-root
 │
@@ -34,6 +35,7 @@
 │
 ├── requirements.txt
 └── README.md
+
 
 [
   { "device_id": "exc_001", "status": "on", "temp": 22.5 },
